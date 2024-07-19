@@ -1,0 +1,33 @@
+# scripts/main.py
+
+from scripts.data_collection import fetch_defi_data
+from scripts.defi_analysis import analyze_liquidity, analyze_volume, calculate_yield
+from scripts.visualization import plot_liquidity, plot_volume, plot_yield
+from utils.data_utils import save_data, load_json
+
+def main():
+    api_url = 'https://api.defipulse.com'
+    endpoint = 'v1/defi/pair'
+    params = {'protocol': 'uniswap', 'pair': 'ETH-USDT'}
+    
+    # Fetch DeFi data
+    defi_data = fetch_defi_data(api_url, endpoint, params)
+    
+    # Save raw data
+    save_data(defi_data.to_dict(orient='records'), 'data/defi_data.json')
+    
+    # Perform analysis
+    avg_liquidity = analyze_liquidity(defi_data)
+    total_volume = analyze_volume(defi_data)
+    yield_data = calculate_yield(defi_data)
+    
+    # Save processed data
+    save_data({'avg_liquidity': avg_liquidity, 'total_volume': total_volume}, 'data/analysis_results.json')
+    
+    # Visualize data
+    plot_liquidity(defi_data)
+    plot_volume(defi_data)
+    plot_yield(yield_data)
+
+if __name__ == '__main__':
+    main()
